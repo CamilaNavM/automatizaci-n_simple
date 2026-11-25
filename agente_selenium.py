@@ -3,7 +3,6 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
-
 # Importación de las funciones del agente y utilidades
 from funciones_agente.obtener_clima import obtener_clima
 from funciones_agente.obtener_precio_accion import obtener_precio_accion
@@ -40,23 +39,13 @@ driver = webdriver.Chrome(service=Service(driver_path), options=options)
 def procesar_input(user_input):
     """
     Determina la intención del usuario analizando palabras clave en el input original.
-    
-    Esta función es el 'ruteador' del agente. Si encuentra palabras relacionadas con
-    clima o acciones, devuelve la referencia a la función que debe ejecutarse.
-    
-    Retorna:
-        function o None: La función del agente correspondiente o None si no se reconoce.
+    Retorna la función correspondiente o None si no hay coincidencia.
     """
     user_input = user_input.lower()
-    
-    # Verificamos si el usuario pregunta por el clima
     if "clima" in user_input or "temperatura" in user_input:
         return obtener_clima
-    
-    # Verificamos si el usuario pregunta por acciones financieras
     elif "precio" in user_input or "accion" in user_input or "valor" in user_input:
         return obtener_precio_accion
-    
     return None
 
 print("Hola, soy tu asistente virtual con soporte para Selenium. ¿En qué puedo ayudarte hoy? (Escribe 'salir' para terminar)")

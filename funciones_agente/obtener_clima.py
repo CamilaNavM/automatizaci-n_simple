@@ -1,32 +1,26 @@
-# Módulo encargado de la integración con servicios meteorológicos externos
+import re
 import requests
 
+
+PALABRAS_IGNORAR = {
+    "clima", "temperatura", "en", "de", "del", "la", "el", "es",
+    "cual", "cuál", "que", "qué", "hace", "hay", "hoy", "actual", "dime",
+}
+
 def obtener_clima(driver, user_input):
-    """
-    Obtiene la temperatura actual de una ciudad utilizando el servicio wttr.in.
-    
-    Argumentos:
-        driver: Instancia de Selenium WebDriver (no se usa en esta implementación, pero se mantiene por compatibilidad).
-        user_input: El texto ingresado por el usuario o ya procesado.
-    
-    Retorna:
-        Una cadena con la temperatura o un mensaje de error.
-    """
-    # Intentamos extraer el nombre de la ciudad eliminando palabras clave comunes
-    # Esto ayuda si se le pasa el input completo sin procesar previamente
-    city = user_input.lower().replace("clima", "").replace("temperatura", "").replace("en", "").replace("de", "").strip()
-    
+    """Obtiene la temperatura actual de una ciudad usando wttr.in."""
+    palabras = re.findall(r"\w+", user_input.lower())
+    ciudad = " ".join(p for p in palabras if p not in PALABRAS_IGNORAR)
+
+    if not ciudad:
+        return "¿De qué ciudad? Ejemplo: clima en Monterrey"
+
     try:
-        # Realizamos una petición GET al servicio wttr.in
-        # Usamos el parámetro format=%t para recibir únicamente la temperatura (ej. +25°C)
-        response = requests.get(f"https://wttr.in/{city}?format=%t", timeout=10)
-        
-        # Si la respuesta es exitosa (200), devolvemos el texto
+        response = requests.get(f"https://wttr.in/{ciudad.replace(' ', '+')}?format=%t", timeout=10)
+        response.encoding = "utf-8"
         if response.status_code == 200:
-            return response.text.strip()
+            return f"La temperatura en {ciudad.title()} es {response.text.strip()}"
         else:
-            return "No se pudo obtener el clima para esa ubicación (Código de error)."
-            
+            return "No se pudo obtener el clima para esa ubicación."
     except Exception as e:
-        # Manejo de excepciones en caso de fallo en la conexión o timeout
         return f"Error de red al obtener el clima: {e}"
