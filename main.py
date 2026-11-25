@@ -16,7 +16,7 @@ def procesar_input(user_input):
 driver = None   
 print("Hola, soy tu asistente virtual. En que puedo ayudarte? (escribe 'salir' o 'q' para terminar)")
 while True:
-    user_input = sanitizar(input("---> "))
+    user_input = input("---> ").strip().lower()
     if user_input.lower() in ("salir", "exit", "adios", "q"):
         print("¡Hasta luego!")       
         break
